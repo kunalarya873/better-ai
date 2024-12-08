@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Analysis Tool</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 20px 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        main {
+            margin: 20px auto;
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            background-color: #f9f9f9;
+            transition: box-shadow 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            box-shadow: 0 0 8px #007BFF;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 5px solid #007BFF;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            padding: 10px;
+            background-color: #f4f4f9;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        footer a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <!-- Add CDN for markdown.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/markdown.js/0.5.0/markdown.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/markdown.css/2.1.0/markdown.min.css">
+</head>
+<body>
+    <header>
+        <h1>AI Code Analysis Tool</h1>
+    </header>
+    <main>
+        <form id="analyzeForm">
+            <label for="code">Paste your code snippet here:</label><br>
+            <textarea id="code" name="code"></textarea><br>
+            <button type="submit">Analyze Code</button>
+        </form>
+        <div class="response" id="response"></div>
+    </main>
+    <footer>
+        <p>Created with ❤️ by <a href="https://github.com/kunalarya873">Kunal Arya</a></p>
+    </footer>
+    <script>
+        document.getElementById("analyzeForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            
+            const codeSnippet = document.getElementById("code").value;
+
+            const responseDiv = document.getElementById("response");
+            responseDiv.textContent = "Analyzing...";
+
+            try {
+                const response = await fetch("/analyze", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ code: codeSnippet })
+                });
+
+                const data = await response.json();
+                if (data.analysis) {
+                    // Render the markdown content using markdown.js
+                    responseDiv.innerHTML = markdown.toHTML(data.analysis);
+                } else {
+                    responseDiv.textContent = "Error: " + (data.error || "Unknown error");
+                }
+            } catch (error) {
+                responseDiv.textContent = "Error: " + error.message;
+            }
+        });
+    </script>
+</body>
+</html>
